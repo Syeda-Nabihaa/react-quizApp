@@ -12,81 +12,79 @@ export default function AdminLogin() {
     email: "",
     password: "",
   });
- 
-  const [formState , setFormState] = useState({
-    data : null,
-    errors:{},
-    isLoading:false
-  })
-  // const [errors, setErrors] = useState({});
+
+  const [formState, setFormState] = useState({
+    data: null,
+    errors: {},
+    isLoading: false,
+  });
 
   function handleChange(event) {
     const { name, value, type, checked } = event.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
   }
+
   async function submit(event) {
     event.preventDefault();
-
+    setFormState((prev) => ({ ...prev, isLoading: true, errors: {} }));
 
     const formDataObj = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       formDataObj.append(key, value);
     });
-   
-     const result = await AdminLoginRecall(formDataObj);
-     console.log(result);
-     
-     if(!result.success){
-      setFormState((prev)=>({
-        ...prev,
-        isLoading:false,
-        errors:result.error,
-      }))
-      
-     }else{
-      try{
-        const {email , password} = formData;
-        const response = await authService.AdminLogin({
-          email,
-          password,
-        })
-        const data = response;
-        console.log(data);
 
-        if(data.statusCode === 200){
-          setFormState((prev)=>({...prev, isLoading: false, errors:{} }));
-        
-        }else{
-          // setErrors(response.statusCode)
-        }
-        console.log("response", data);
-        
-        
-      }catch(error){
-        console.log(Object.values(error));
+    try {
+      const result = await AdminLoginRecall(formDataObj);
+      console.log(result);
 
-        const errorMsg = error.response?.data?.message || error.message || "An unkonow error occured";
-
-        console.error("login error : ", errorMsg);
-
-        setFormState((prev)=>({
+      if (!result.success) {
+        setFormState((prev) => ({
           ...prev,
-          isLoading:false,
-          errors:{
-            email :[error.message.email],
-            password : [error.message.password],
-          }
-        }))
-        
-        
+          isLoading: false,
+          errors: result.error,
+        }));
+        return;
       }
-     }
-     console.log(formState);
 
+      const { email, password } = formData;
+      const response = await authService.AdminLogin({ email, password });
+      console.log(response);
+
+      if (response.statusCode === 200) {
+        setFormState({
+          data: response,
+          isLoading: false,
+          errors: {},
+        });
+      } else {
+        setFormState((prev) => ({
+          ...prev,
+          isLoading: false,
+          errors: { message: "Invalid credentials." },
+        }));
+      }
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "An unknown error occurred.";
+
+      console.error("Login error:", errorMsg);
+
+      setFormState((prev) => ({
+        ...prev,
+        isLoading: false,
+        errors: {
+          email: [errorMsg],
+          password: [errorMsg],
+        },
+      }));
+    }
   }
+  console.log(formState);
   return (
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
@@ -112,7 +110,7 @@ export default function AdminLogin() {
             onChange={handleChange}
             name="email"
           />
-          {/* {formState.errors.email && <p className="text-red-500">{formState.errors.email[0]}</p>} */}
+          {formState.errors.email && <p className="text-red-500">{formState.errors.email[0]}</p>}
           {/* Password */}
           <InputField
             variant="auth"

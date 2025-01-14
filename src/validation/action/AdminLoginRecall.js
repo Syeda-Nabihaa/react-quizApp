@@ -1,15 +1,13 @@
 import { adminLoginSchema } from "../config/zodSchema";
-import HandleError from "./errorhandle";
+import HandleErorrs from "./errorhandle";
 
 async function AdminLoginRecall(formData) {
-    const logInData = {
-        email: formData.get("email"),
-        password: formData.get("password"),
-        
-    };
+  const logInData = {
+    email: formData.get("email"),
+    password: formData.get("password"),
+  };
 
-    const result = adminLoginSchema.safeParse(logInData);
-    return HandleError(result);
-    
+  const result = adminLoginSchema.safeParse(logInData);
+  return HandleErorrs(result);
 }
 export default AdminLoginRecall;

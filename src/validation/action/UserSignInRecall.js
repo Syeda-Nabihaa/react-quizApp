@@ -1,17 +1,16 @@
 import { addRecallSchema } from "../config/zodSchema";
-import HandleError from "./errorhandle";
+import HandleErorrs from "./errorhandle";
 
 async function UserSignInRecall(formData) {
-    const SignInData = {
-        firstname: formData.get("firstname"),
-        lastname: formData.get("lastname"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-        work: formData.get("work")
-    };
+  const SignInData = {
+    firstname: formData.get("firstname"),
+    lastname: formData.get("lastname"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    work: formData.get("work"),
+  };
 
-    const result = addRecallSchema.safeParse(SignInData);
-    return HandleError(result);
-    
+  const result = addRecallSchema.safeParse(SignInData);
+  return HandleErorrs(result);
 }
 export default UserSignInRecall;
