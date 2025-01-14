@@ -1,4 +1,4 @@
-import { addRecallSchema } from "../config/zodSchema";
+import { AdminSignInSchema } from "../config/zodSchema";
 import HandleError from "./errorhandle";
 
 async function AdminSignInRecall(formData) {
@@ -10,7 +10,7 @@ async function AdminSignInRecall(formData) {
         work: formData.get("work")
     };
 
-    const result = addRecallSchema.safeParse(SignInData);
+    const result = AdminSignInSchema.safeParse(SignInData);
     return HandleError(result);
     
 }

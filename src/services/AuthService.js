@@ -10,11 +10,16 @@ export class AuthService {
                 },
             });
             return response.data;
-        }catch(error){
-            const errorMessage = error.response?.data?.message || error.message || "An unknown error occured";
-            console.error("SignIn error :", errorMessage);
-            throw new Error(errorMessage);
-        }
+        }catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred";
+            console.error("SignIn error:", errorMessage);
+        
+            // Instead of throwing an error, return a structured object with the message
+            return {
+              success: false,
+              error: error.response?.data || { message: errorMessage },
+            };
+          }
     }
 
     async AdminSignIn(body){

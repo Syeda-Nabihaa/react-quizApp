@@ -3,6 +3,9 @@ import { FcGoogle } from "react-icons/fc";
 import InputField from "../../components/fields/InputField";
 import AuthService from "../../services/AuthService";
 import { useState } from "react";
+import UserSignInRecall from "../../validation/action/UserSignInRecall";
+import Loader from "../../components/loader/loader";
+
 // import Checkbox from "components/checkbox";
 
 export default function UserSignIn() {
@@ -17,6 +20,12 @@ export default function UserSignIn() {
               image:""
             });
             
+            const [formState, setFormState] = useState({
+              data: null,
+              errors: {},
+              isLoading: false,
+            });
+
             function handleChange(event){
               const {name , value , type , checked} = event.target
               setFormData({
@@ -26,18 +35,58 @@ export default function UserSignIn() {
               })
             }
     
-            async function handleSubmit(event){
+            async function submit(event) {
               event.preventDefault();
-              try{
-                  const response = await authService.AdminSignIn(formData)
-              
-                  console.log(`Login successful:`, response.data);
-              }catch(error){
-                  console.error(`Login failed:`, error.message);
+              setFormState((prev) => ({ ...prev, isLoading: true }));
+            
+              const formDataObj = new FormData();
+              Object.entries(formData).forEach(([key, value]) => {
+                formDataObj.append(key, value);
+              });
+            
+              const result = await UserSignInRecall(formDataObj); // Validation before submission
+            
+              if (!result.success) {
+                setFormState((prev) => ({
+                  ...prev,
+                  isLoading: false,
+                  errors: result.error,
+                }));
+                return; // Stop execution if validation fails
               }
-               console.log("email", formData.email)
-               console.log("password", formData.password)
+            
+              try {
+                const { firstname, lastname, work, email, password, number } = formData;
+                const response = await authService.UserSignIn({ firstname, lastname, work, number, email, password });
+            
+                if (response.statusCode === 200) {
+                  setFormState((prev) => ({ ...prev, isLoading: false, errors: {} }));
+                  console.log("Login successful:", response);
+                } else {
+                  setFormState((prev) => ({
+                    ...prev,
+                    isLoading: false,
+                    errors: { general: "Login failed. Please try again." },
+                  }));
+                }
+              } catch (error) {
+                // Handle error returned by UserSignIn
+                const errorMsg = error.message || "An unknown error occurred";
+                console.error("SignIn error:", errorMsg);
+            
+                // Ensure we correctly handle the errors for email and password
+                setFormState((prev) => ({
+                  ...prev,
+                  isLoading: false,
+                  errors: {
+                    email: error.response?.data?.email || errorMsg,
+                    password: error.response?.data?.password || errorMsg,
+                  },
+                }));
+              }
             }
+            
+
   return (
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
@@ -62,7 +111,7 @@ export default function UserSignIn() {
           <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={submit}>
             
         <InputField
           variant="auth"
@@ -76,6 +125,8 @@ export default function UserSignIn() {
           onChange = {handleChange}
           
           />
+         {formState.errors.firstname && <p className="text-red-500">{formState.errors.firstname[0]}</p>}
+
          <InputField
           variant="auth"
           extra="mb-3"
@@ -87,6 +138,8 @@ export default function UserSignIn() {
           value={formData.lastname}
           onChange = {handleChange}
           />
+          {formState.errors.lastname && <p className="text-red-500">{formState.errors.lastname[0]}</p>}
+
           <InputField
           variant="auth"
           extra="mb-3"
@@ -98,6 +151,8 @@ export default function UserSignIn() {
           value={formData.work}
           onChange = {handleChange}
           />
+          {formState.errors.work && <p className="text-red-500">{formState.errors.work[0]}</p>}
+
 
           <InputField
           variant="auth"
@@ -110,6 +165,8 @@ export default function UserSignIn() {
           value={formData.number}
           onChange = {handleChange}
         />
+        {formState.errors.number && <p className="text-red-500">{formState.errors.number[0]}</p>}
+
 
 
         <InputField
@@ -123,6 +180,8 @@ export default function UserSignIn() {
           value={formData.email}
           onChange = {handleChange}
           />
+          {formState.errors.email && <p className="text-red-500">{formState.errors.email[0]}</p>}
+
 
         <InputField
           variant="auth"
@@ -135,13 +194,15 @@ export default function UserSignIn() {
           value={formData.password}
           onChange = {handleChange}
           />
+          {formState.errors.password && <p className="text-red-500">{formState.errors.password[0]}</p>}
+
          <InputField
           variant="auth"
           extra="mb-3"
           label="Image*"
           placeholder="Image"
           id="image"
-          type="image"
+          type="file"
           name="image"
           value={formData.image}
           onChange = {handleChange}
@@ -165,7 +226,9 @@ export default function UserSignIn() {
         <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
           Sign In
         </button>
- </form>
+        {formState.isLoading && <Loader />}
+        {formState.errors.general && <p className="text-red-500 mt-3">{formState.errors.general}</p>}
+       </form>
         <div className="mt-4">
           <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
             Not registered yet?

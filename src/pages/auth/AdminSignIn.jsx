@@ -3,6 +3,12 @@ import { FcGoogle } from "react-icons/fc";
 import InputField from "../../components/fields/InputField";
 import { useState } from "react";
 import AuthService from "../../services/AuthService";
+import AdminSignInRecall from "../../validation/action/AdminSignInRecall";
+import Loader from "../../components/loader/loader";
+import { Outlet } from "react-router-dom";
+
+
+
 // import Checkbox from "components/checkbox";
 
 export default function AdminSignIn() {
@@ -16,6 +22,13 @@ export default function AdminSignIn() {
           password: "",
           image:""
         });
+
+        const [formState, setFormState] = useState({
+          data: null,
+          errors: {},
+          isLoading: false,
+        });
+      
         
         function handleChange(event){
           const {name , value , type , checked} = event.target
@@ -26,18 +39,54 @@ export default function AdminSignIn() {
           })
         }
 
-        async function handleSubmit(event){
+        async function submit(event) {
           event.preventDefault();
-          try{
-              const response = await authService.AdminSignIn(formData)
-          
-              console.log(`Login successful:`, response.data);
-          }catch(error){
-              console.error(`Login failed:`, error.message);
+          setFormState((prev) => ({ ...prev, isLoading: true }));
+      
+          const formDataObj = new FormData();
+          Object.entries(formData).forEach(([key, value]) => {
+            formDataObj.append(key, value);
+          });
+      
+          const result = await AdminSignInRecall(formDataObj);
+          if (!result.success) {
+            setFormState((prev) => ({
+              ...prev,
+              isLoading: false,
+              errors: result.error,
+            }));
+          } else {
+            try {
+              const {firstname,lastname,work,email, password,number } = formData;
+              const response = await authService.AdminSignIn({firstname, lastname,work, number, email, password });
+              const data = response;
+      
+              if (data.statusCode === 200) {
+                setFormState((prev) => ({ ...prev, isLoading: false, errors: {} }));
+                console.log("Login successful:", data);
+              } else {
+                setFormState((prev) => ({
+                  ...prev,
+                  isLoading: false,
+                  errors: { general: "Login failed. Please try again." },
+                }));
+              }
+            } catch (error) {
+              const errorMsg = error.response?.data?.message || error.message || "An unknown error occurred.";
+              console.error("Login error:", errorMsg);
+      
+              setFormState((prev) => ({
+                ...prev,
+                isLoading: false,
+                errors: {
+                  email: error.response?.data?.email || [errorMsg],
+                  password: error.response?.data?.password || [errorMsg],
+                },
+              }));
+            }
           }
-           console.log("email", formData.email)
-           console.log("password", formData.password)
         }
+
   return (
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
@@ -62,7 +111,7 @@ export default function AdminSignIn() {
           <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
         </div>
       
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={submit}>
 
         <InputField
           variant="auth"
@@ -76,6 +125,8 @@ export default function AdminSignIn() {
           onChange = {handleChange}
           
           />
+        {formState.errors.firstname && <p className="text-red-500">{formState.errors.firstname[0]}</p>}
+
          <InputField
           variant="auth"
           extra="mb-3"
@@ -87,6 +138,8 @@ export default function AdminSignIn() {
           value={formData.lastname}
           onChange = {handleChange}
         />
+       {formState.errors.lastname && <p className="text-red-500">{formState.errors.lastname[0]}</p>}
+
           <InputField
           variant="auth"
           extra="mb-3"
@@ -97,7 +150,10 @@ export default function AdminSignIn() {
           name="work"
           value={formData.work}
           onChange = {handleChange}
+
           />
+        {formState.errors.work && <p className="text-red-500">{formState.errors.work[0]}</p>}
+
 
           <InputField
           variant="auth"
@@ -110,6 +166,8 @@ export default function AdminSignIn() {
           value={formData.number}
           onChange = {handleChange}
         />
+        {formState.errors.number && <p className="text-red-500">{formState.errors.number[0]}</p>}
+
 
 
         <InputField
@@ -123,6 +181,8 @@ export default function AdminSignIn() {
           value={formData.email}
           onChange = {handleChange}
           />
+        {formState.errors.email && <p className="text-red-500">{formState.errors.email[0]}</p>}
+
 
         <InputField
           variant="auth"
@@ -135,6 +195,8 @@ export default function AdminSignIn() {
           value={formData.password}
           onChange = {handleChange}
           />
+       {formState.errors.password && <p className="text-red-500">{formState.errors.password[0]}</p>}
+
          <InputField
           variant="auth"
           extra="mb-3"
@@ -164,6 +226,7 @@ export default function AdminSignIn() {
         <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
           Sign In
         </button>
+        {formState.isLoading && <Loader />}
       </form>
         <div className="mt-4">
           <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
@@ -177,6 +240,7 @@ export default function AdminSignIn() {
           </a>
         </div>
       </div>
+      <Outlet />
     </div>
   );
 }
