@@ -4,11 +4,15 @@ import UserSignIn from "../pages/auth/UserSignIn";
 const SignInRoutes = [
   {
     path: "/",
-    element: <AdminSignIn />, // Default route for "/auth"
+     // Default route for "/auth"
     children: [
       {
-        path: "register", // Nested path "/auth/register"
+        path: "/", // Nested path "/auth/register"
         element: <UserSignIn />,
+      },
+      {
+        path: "/adminsignin", // Nested path "/auth/register"
+        element: <AdminSignIn />,
       },
     ],
   },
