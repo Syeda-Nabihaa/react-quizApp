@@ -3,8 +3,11 @@
 import { HiX } from "react-icons/hi";
 import Links from "./components/Links";
 
-import SidebarCard from "components/sidebar/componentsrtl/SidebarCard";
-import routes from "routes.js";
+// import SidebarCard from "../sidebar/componentsrtl/SidebarCard";
+import routes from "../../routes";
+import FreeCard from "./components/SidebarCard";
+;
+
 
 const Sidebar = ({ open, onClose }) => {
   return (
@@ -34,7 +37,7 @@ const Sidebar = ({ open, onClose }) => {
 
       {/* Free Horizon Card */}
       <div className="flex justify-center">
-        <SidebarCard />
+        <FreeCard />
       </div>
 
       {/* Nav item end */}

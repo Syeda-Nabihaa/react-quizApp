@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {  Outlet, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
@@ -44,17 +44,17 @@ export default function Admin(props) {
     }
     return activeNavbar;
   };
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route path={`/${prop.path}`} element={prop.component} key={key} />
-        );
-      } else {
-        return null;
-      }
-    });
-  };
+  // const getRoutes = (routes) => {
+  //   return routes.map((prop, key) => {
+  //     if (prop.layout === "/admin") {
+  //       return (
+  //         <Route path={`/${prop.path}`} element={prop.component} key={key} />
+  //       );
+  //     } else {
+  //       return null;
+  //     }
+  //   });
+  // };
 
   document.documentElement.dir = "ltr";
   return (
@@ -76,14 +76,15 @@ export default function Admin(props) {
               {...rest}
             />
             <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-              <Routes>
+              {/* <Routes>
                 {getRoutes(routes)}
 
                 <Route
                   path="/"
                   element={<Navigate to="/admin/default" replace />}
                 />
-              </Routes>
+              </Routes> */}
+              <Outlet />
             </div>
             <div className="p-3">
               <Footer />

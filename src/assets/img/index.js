@@ -1,3 +1,3 @@
-import authimage from './auth/auth.png'
+import authimage from './auth/bgImg.jpg'
 
 export {authimage}

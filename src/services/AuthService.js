@@ -40,7 +40,7 @@ export class AuthService {
 
     async AdminLogin(body){
         try{
-            const response = await axios.post(allApiEndPoints.adminLogin, body,{
+            const response = await axios.post(allApiEndPoints.loginUser, body,{
                 headers :{
                     "Content-Type" : "application/json",
                 },
