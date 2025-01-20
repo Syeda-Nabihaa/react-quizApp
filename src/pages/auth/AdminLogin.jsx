@@ -46,7 +46,7 @@ export default function AdminLogin() {
 
           setTimeout(() => {
             if (user.role === "Admin") {
-              navigate("/adminsignin");
+              navigate("/dashboard");
             } else if (user.role === "User") {
               navigate("/dashboard");
             }

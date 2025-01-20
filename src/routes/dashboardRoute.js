@@ -1,5 +1,6 @@
 import AdminDashboard from "../layout/AdminLayout";
-import UserList from "../pages/admin/user/Userlist";
+import AddQuestion from "../pages/admin/question/AddQuestion";
+import ShowQuestion from "../pages/admin/question/ShowQuestion";
 
 const DashboardRoutes = [
     {
@@ -10,8 +11,13 @@ const DashboardRoutes = [
             element: <AdminDashboard />,
           },
           {
-            path: "userlist", 
-            element: <UserList />,
+            path: "showquestion", 
+            element: <ShowQuestion />,
+          },
+          
+          {
+            path: "addquestion", 
+            element: <AddQuestion />,
           },
           
     ]

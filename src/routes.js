@@ -22,11 +22,23 @@
 
 const routes = [
   {
-    name: "Main Dashboard",
+    name: "Main Dashboard ",
     layout: "/dashboard",
-    path: "/dashboard",
+    path: "dashboard",
     // icon: <MdHome className="h-6 w-6" />,
     // component: <AdminDashboard />,
+  },
+  {
+    name: "Show Question ",
+    layout: "/dashboard",
+    path: "showquestion",
+    
+  },
+  {
+    name: "Add Question ",
+    layout: "/dashboard",
+    path: "addquestion",
+    
   },
   // {
   //   name: "NFT Marketplace",

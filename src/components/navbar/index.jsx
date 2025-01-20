@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 // import navbarimage from "assets/img/layout/Navbar.png";
 import { BsArrowBarUp } from "react-icons/bs";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
+import avatarImage from "../../assets/img/avatars/avatar4.png"
 import {
   IoMdNotificationsOutline,
   // IoMdInformationCircleOutline,
@@ -52,7 +53,7 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
           <FiSearch className="h-4 w-4 text-gray-400 pl-3" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search "
             className="h-full w-full rounded-full bg-lightPrimary text-sm text-navy-700 outline-none placeholder-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder-white"
           />
         </div>
@@ -113,7 +114,7 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
           button={
             <img
               className="h-10 w-10 rounded-full"
-              // src={avatar}
+              src={avatarImage}
               alt="Profile"
             />
           }

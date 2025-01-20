@@ -57,7 +57,7 @@ export default function AdminDashboard(props) {
   //   });
   // };
 
-  document.documentElement.dir = "ltr";
+  // document.documentElement.dir = "ltr";
   return (
     <div className="flex h-full w-full">
       <Sidebar open={open} onClose={() => setOpen(false)} />

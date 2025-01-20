@@ -5,6 +5,7 @@ import AuthService from "../../services/AuthService";
 import { useState } from "react";
 import UserSignInRecall from "../../validation/action/UserSignInRecall";
 import Loader from "../../components/loader/loader";
+import { toast } from "react-toastify";
 
 // import Checkbox from "components/checkbox";
 
@@ -70,21 +71,24 @@ export default function UserSignIn() {
                   }));
                 }
               } catch (error) {
-                // Handle error returned by UserSignIn
-                const errorMsg = error.message || "An unknown error occurred";
-                console.error("SignIn error:", errorMsg);
-            
-                // Ensure we correctly handle the errors for email and password
+                // Handle errors in the response body (e.g., validation errors)
                 setFormState((prev) => ({
                   ...prev,
                   isLoading: false,
                   errors: {
-                    email: error.response?.data?.email || errorMsg,
-                    password: error.response?.data?.password || errorMsg,
+                    email: error.response?.data?.message?.email || [],
+                    number: error.response?.data?.message?.number || [],
                   },
                 }));
+          
+                console.error("Signup error:", error);
+          
+                // Optionally display a toast for the error message
+                const errorMessage = error.response?.data?.message || error.message;
+                toast.error(errorMessage);
               }
             }
+            
             
 
   return (
