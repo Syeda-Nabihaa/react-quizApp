@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 // import DashIcon from "components/icons/DashIcon";
 import DashIcon from "../../icons/DashIcon";
+import routeHelpers from "../../../helpers/RouteHelpers";
 // chakra imports
 
 export function SidebarLinks(props) {
@@ -21,7 +22,7 @@ export function SidebarLinks(props) {
     
     return routes.map((route, index) => {
       if (
-        route.layout === "/dashboard" 
+        route.layout === routeHelpers.admin.inRoutesFile 
       ) {
         return (
           <Link key={index} to={route.layout + "/" + route.path}>

@@ -13,7 +13,7 @@ export class AuthService {
           return response.data; // Return data from the response
         } catch (error) {
           // Log the complete error for debugging
-          console.error("Signup error:", error);
+          console.error("Signup error:", error);    
     
           // Throw the complete error so the calling function can handle it
           throw error;
@@ -29,9 +29,11 @@ export class AuthService {
             });
             return response.data;
         }catch(error){
-            const errorMessage = error.response?.data?.message || error.message || "An unknown error occured";
-            console.error("SignIn error :", errorMessage);
-            throw new Error(errorMessage);
+              // Log the complete error for debugging
+          console.error("Signup error:", error);    
+    
+          // Throw the complete error so the calling function can handle it
+          throw error;
         }
     }
 

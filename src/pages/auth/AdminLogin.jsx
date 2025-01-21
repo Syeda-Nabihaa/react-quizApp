@@ -7,6 +7,7 @@ import Helper from "../../helpers/helpers";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import HandleError from "../../validation/action/errorhandle";
+import routeHelpers from "../../helpers/RouteHelpers";
 
 export default function AdminLogin() {
   const authService = new AuthService();
@@ -46,9 +47,13 @@ export default function AdminLogin() {
 
           setTimeout(() => {
             if (user.role === "Admin") {
-              navigate("/dashboard");
+              // navigate("/dashboard");
+              // console.log("Navigating to:", routeHelpers.admin.dashboardRoutes);
+              navigate(routeHelpers.admin.dashboardRoutes)
             } else if (user.role === "User") {
-              navigate("/dashboard");
+              // navigate("/dashboard");
+              navigate(routeHelpers.user.dashboardRoutes)
+
             }
           }, 3000);
         } else {
@@ -109,7 +114,7 @@ export default function AdminLogin() {
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       <div className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]">
         <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-          Admin Login
+           Login Page
         </h4>
         <p className="mb-9 ml-1 text-base text-gray-600">
           Enter your email and password to log in!

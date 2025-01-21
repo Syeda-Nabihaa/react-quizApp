@@ -1,13 +1,15 @@
+import routeHelpers from "../helpers/RouteHelpers";
 import AdminDashboard from "../layout/AdminLayout";
 import AddQuestion from "../pages/admin/question/AddQuestion";
 import ShowQuestion from "../pages/admin/question/ShowQuestion";
+import UpdateQuestion from "../pages/admin/question/UpdateQuestion";
 
 const DashboardRoutes = [
     {
-    path: "/dashboard",
+    path: routeHelpers.admin.inRoutesFile,
     children: [
         {
-            path: "dashboard", 
+            path: "", 
             element: <AdminDashboard />,
           },
           {
@@ -18,6 +20,10 @@ const DashboardRoutes = [
           {
             path: "addquestion", 
             element: <AddQuestion />,
+          },
+          {
+            path: "updatequestion", 
+            element: <UpdateQuestion />,
           },
           
     ]

@@ -5,94 +5,132 @@ import { useState } from "react";
 import AuthService from "../../services/AuthService";
 import AdminSignInRecall from "../../validation/action/AdminSignInRecall";
 import Loader from "../../components/loader/loader";
-import { Outlet } from "react-router-dom";
-
-
+import { Outlet, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+// import routeHelpers from "../../helpers/RouteHelpers";
 
 // import Checkbox from "components/checkbox";
 
 export default function AdminSignIn() {
-      const authService = new AuthService();
-      const [formData, setFormData] = useState({
-          firstname:"",
-          lastname:"",
-          work:"",
-          number:"",
-          email: "",
-          password: "",
-          image:""
-        });
+  const authService = new AuthService();
+  const router = useNavigate()
+  const [formData, setFormData] = useState({
+    firstname: "",
+    lastname: "",
+    work: "",
+    number: "",
+    email: "",
+    password: "",
+    image: "",
+  });
 
-        const [formState, setFormState] = useState({
-          data: null,
-          errors: {},
-          isLoading: false,
-        });
-      
-        
-        function handleChange(event){
-          const {name , value , type , checked} = event.target
-          setFormData({
-            ...formData,
-            [name]:type ==="checkbox"? checked : value,
-         
-          })
-        }
+  const [formState, setFormState] = useState({
+    data: null,
+    errors: {},
+    isLoading: false,
+  });
 
-        async function submit(event) {
-          event.preventDefault();
-          setFormState((prev) => ({ ...prev, isLoading: true }));
+  function handleChange(event) {
+    const { name, value, type, checked } = event.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  }
+
+  async function ApiCall(SignInData) {
+    try {
+      const { firstname, lastname, work, email, password, number } = SignInData;
+      console.log(SignInData);
+      console.log(formData);
       
-          const formDataObj = new FormData();
-          Object.entries(formData).forEach(([key, value]) => {
-            formDataObj.append(key, value);
-          });
+      const response = await authService.AdminSignIn({
+        firstname,
+        lastname,
+        work,
+        number,
+        email,
+        password,
+      });
+      // const data = response;
+      console.log(response);
       
-          const result = await AdminSignInRecall(formDataObj);
-          if (!result.success) {
-            setFormState((prev) => ({
-              ...prev,
-              isLoading: false,
-              errors: result.error,
-            }));
-          } else {
-            try {
-              const {firstname,lastname,work,email, password,number } = formData;
-              const response = await authService.AdminSignIn({firstname, lastname,work, number, email, password });
-              const data = response;
+      if (response.succes === true) {
+        setFormState((prev) => ({ ...prev, isLoading: false, errors: {} }));
+        toast.success("user has been added");
+        setTimeout(() => {
+          router("/");
+        }, 1000);
+        console.log("Login successful:", response);
+      }
+    } catch (error) {
+      setFormState((prev) => ({
+        ...prev,
+        isLoading: false,
+        errors: {
+          email: error?.response?.data?.message?.email || [],
+          number: error.response?.data?.message?.number || [],
+        },
+      }));
+      console.error("Signup error:", error);
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error(errorMessage);
+    }
+
+    
+  }
+
+  // const handleErrors = (statusCode) => {
+  //   if (statusCode === 400) {
+  //     toast.error("Invalid login request!");
+  //     setFormState((prev) => ({
+  //       ...prev,
+  //       errors: { general: "Bad request." },
+  //     }));
+  //   } else {
+  //     toast.error("Invalid login credentials.");
+  //     setFormState((prev) => ({
+  //       ...prev,
+  //       errors: { general: "Invalid credentials." },
+  //     }));
+  //   }
+  // };
+
+  async function submit(event) {
+    event.preventDefault();
+    setFormState((prev) => ({ ...prev, isLoading: true }));
+
+    const formDataObj = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      formDataObj.append(key, value);
+      for (let [key, value] of formDataObj.entries()) {
+        console.log(key, value);
+      }
       
-              if (data.statusCode === 200) {
-                setFormState((prev) => ({ ...prev, isLoading: false, errors: {} }));
-                console.log("Login successful:", data);
-              } else {
-                setFormState((prev) => ({
-                  ...prev,
-                  isLoading: false,
-                  errors: { general: "Login failed. Please try again." },
-                }));
-              }
-            } catch (error) {
-              const errorMsg = error.response?.data?.message || error.message || "An unknown error occurred.";
-              console.error("Login error:", errorMsg);
       
-              setFormState((prev) => ({
-                ...prev,
-                isLoading: false,
-                errors: {
-                  email: error.response?.data?.email || [errorMsg],
-                  password: error.response?.data?.password || [errorMsg],
-                },
-              }));
-            }
-          }
-        }
+    });
+    
+
+    const result = await AdminSignInRecall(formDataObj);
+    if (!result.success) {
+      setFormState((prev) => ({
+        ...prev,
+        isLoading: false,
+        errors: result.error,
+      }));
+      toast.error("Fill the form correctly");
+    } else {
+      ApiCall(result.data);
+    }
+  }
 
   return (
+    
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
       <div className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]">
         <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-         Admin Sign In
+          Admin Sign In
         </h4>
         <p className="mb-9 ml-1 text-base text-gray-600">
           Enter your email and password to sign in!
@@ -110,124 +148,130 @@ export default function AdminSignIn() {
           <p className="text-base text-gray-600 dark:text-white"> or </p>
           <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
         </div>
-      
-      <form onSubmit={submit}>
 
-        <InputField
-          variant="auth"
-          extra="mb-3"
-          label="FisrtName*"
-          placeholder="Enter firstname"
-          id="firstname"
-          type="text"
-          name = "firstname"
-          value ={formData.firstname}
-          onChange = {handleChange}
-          
+        <form onSubmit={submit}>
+          <InputField
+            variant="auth"
+            extra="mb-3"
+            label="FisrtName*"
+            placeholder="Enter firstname"
+            id="firstname"
+            type="text"
+            name="firstname"
+            value={formData.firstname}
+            onChange={handleChange}
           />
-        {formState.errors.firstname && <p className="text-red-500">{formState.errors.firstname[0]}</p>}
-
-         <InputField
-          variant="auth"
-          extra="mb-3"
-          label="LastName*"
-          placeholder="Enter lastname"
-          id="lastname"
-          type="text"
-          name="lastname"
-          value={formData.lastname}
-          onChange = {handleChange}
-        />
-       {formState.errors.lastname && <p className="text-red-500">{formState.errors.lastname[0]}</p>}
+          {formState.errors.firstname && (
+            <p className="text-red-500">{formState.errors.firstname[0]}</p>
+          )}
 
           <InputField
-          variant="auth"
-          extra="mb-3"
-          label="work"
-          placeholder="Enter work"
-          id="work"
-          type="text"
-          name="work"
-          value={formData.work}
-          onChange = {handleChange}
-
+            variant="auth"
+            extra="mb-3"
+            label="LastName*"
+            placeholder="Enter lastname"
+            id="lastname"
+            type="text"
+            name="lastname"
+            value={formData.lastname}
+            onChange={handleChange}
           />
-        {formState.errors.work && <p className="text-red-500">{formState.errors.work[0]}</p>}
-
+          {formState.errors.lastname && (
+            <p className="text-red-500">{formState.errors.lastname[0]}</p>
+          )}
 
           <InputField
-          variant="auth"
-          extra="mb-3"
-          label="work"
-          placeholder="Enter number"
-          id="number"
-          type="number"
-          name="number"
-          value={formData.number}
-          onChange = {handleChange}
-        />
-        {formState.errors.number && <p className="text-red-500">{formState.errors.number[0]}</p>}
-
-
-
-        <InputField
-          variant="auth"
-          extra="mb-3"
-          label="Email*"
-          placeholder="mail@simmmple.com"
-          id="email"
-          type="text"
-          name="email"
-          value={formData.email}
-          onChange = {handleChange}
+            variant="auth"
+            extra="mb-3"
+            label="work"
+            placeholder="Enter work"
+            id="work"
+            type="text"
+            name="work"
+            value={formData.work}
+            onChange={handleChange}
           />
-        {formState.errors.email && <p className="text-red-500">{formState.errors.email[0]}</p>}
+          {formState.errors.work && (
+            <p className="text-red-500">{formState.errors.work[0]}</p>
+          )}
 
-
-        <InputField
-          variant="auth"
-          extra="mb-3"
-          label="Password*"
-          placeholder="Min. 8 characters"
-          id="password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange = {handleChange}
+          <InputField
+            variant="auth"
+            extra="mb-3"
+            label="Number"
+            placeholder="Enter number"
+            id="number"
+            type="number"
+            name="number"
+            value={formData.number}
+            onChange={handleChange}
           />
-       {formState.errors.password && <p className="text-red-500">{formState.errors.password[0]}</p>}
+          {formState.errors.number && (
+            <p className="text-red-500">{formState.errors.number[0]}</p>
+          )}
 
-         <InputField
-          variant="auth"
-          extra="mb-3"
-          label="Image*"
-          placeholder="Image"
-          id="image"
-          type="image"
-          name="image"
-          value={formData.image}
-          onChange = {handleChange}
+          <InputField
+            variant="auth"
+            extra="mb-3"
+            label="Email*"
+            placeholder="mail@simmmple.com"
+            id="email"
+            type="text"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
           />
-        {/* Checkbox */}
-        <div className="mb-4 flex items-center justify-between px-2">
-          <div className="flex items-center">
-            {/* <Checkbox /> */}
-            <p className="ml-2 text-2xl font-medium text-navy-700 dark:text-white">
-              Keep me logged In
-            </p>
+          {formState.errors.email && (
+            <p className="text-red-500">{formState.errors.email[0]}</p>
+          )}
+
+          <InputField
+            variant="auth"
+            extra="mb-3"
+            label="Password*"
+            placeholder="Min. 8 characters"
+            id="password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          {formState.errors.password && (
+            <p className="text-red-500">{formState.errors.password[0]}</p>
+          )}
+
+          <InputField
+            variant="auth"
+            extra="mb-3"
+            label="Image*"
+            placeholder="Image"
+            id="image"
+            type="image"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+          />
+          {/* Checkbox */}
+          <div className="mb-4 flex items-center justify-between px-2">
+            <div className="flex items-center">
+              {/* <Checkbox /> */}
+              <p className="ml-2 text-2xl font-medium text-navy-700 dark:text-white">
+                Keep me logged In
+              </p>
+            </div>
+            <a
+              className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
+              href=" "
+            >
+              Forgot Password?
+            </a>
           </div>
-          <a
-            className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
-            href=" "
-          >
-            Forgot Password?
-          </a>
-        </div>
-        <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
-          Sign In
-        </button>
-        {formState.isLoading && <Loader />}
-      </form>
+          <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
+            Sign In
+          </button>
+          {formState.isLoading && <Loader />}
+          <ToastContainer />
+        </form>
         <div className="mt-4">
           <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
             Not registered yet?

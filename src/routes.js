@@ -7,6 +7,8 @@
 // import DataTables from "views/admin/tables";
 // import RTLDefault from "views/rtl/default";
 
+import routeHelpers from "./helpers/RouteHelpers";
+
 // // Auth Imports
 // import SignIn from "views/auth/SignIn";
 
@@ -22,23 +24,24 @@
 
 const routes = [
   {
-    name: "Main Dashboard ",
-    layout: "/dashboard",
-    path: "dashboard",
-    // icon: <MdHome className="h-6 w-6" />,
-    // component: <AdminDashboard />,
+    name: "Main Dashboard",
+    layout: routeHelpers.admin.dashboardRoutes, // Admin dashboard base path
+    path: "", // This will lead to `/admin/dashboard/`
   },
   {
-    name: "Show Question ",
-    layout: "/dashboard",
-    path: "showquestion",
-    
+    name: "Show Question",
+    layout: routeHelpers.admin.dashboardRoutes,
+    path: "showquestion", // This will lead to `/admin/dashboard/showquestion`
   },
   {
-    name: "Add Question ",
-    layout: "/dashboard",
-    path: "addquestion",
-    
+    name: "Add Question",
+    layout: routeHelpers.admin.dashboardRoutes,
+    path: "addquestion", // This will lead to `/admin/dashboard/addquestion`
+  },
+  {
+    name: "Update Question",
+    layout: routeHelpers.admin.dashboardRoutes,
+    path: "updatequestion", // This will lead to `/admin/dashboard/updatequestion`
   },
   // {
   //   name: "NFT Marketplace",

@@ -6,5 +6,6 @@ export const allApiEndPoints = {
     loginUser: `${environment.baseURL}loginUser`,
     showQuestion: `${environment.baseURL}admin/showQuestion`,
     addQuestion: `${environment.baseURL}admin/addQuestion`,
+    updateQuestion: `${environment.baseURL}admin/updateQuestion/2`,
    
 }

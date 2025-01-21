@@ -5,7 +5,7 @@ import AuthService from "../../services/AuthService";
 import { useState } from "react";
 import UserSignInRecall from "../../validation/action/UserSignInRecall";
 import Loader from "../../components/loader/loader";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 // import Checkbox from "components/checkbox";
 
@@ -35,29 +35,11 @@ export default function UserSignIn() {
              
               })
             }
-    
-            async function submit(event) {
-              event.preventDefault();
-              setFormState((prev) => ({ ...prev, isLoading: true }));
-            
-              const formDataObj = new FormData();
-              Object.entries(formData).forEach(([key, value]) => {
-                formDataObj.append(key, value);
-              });
-            
-              const result = await UserSignInRecall(formDataObj); // Validation before submission
-            
-              if (!result.success) {
-                setFormState((prev) => ({
-                  ...prev,
-                  isLoading: false,
-                  errors: result.error,
-                }));
-                return; // Stop execution if validation fails
-              }
-            
+
+            async function ApiCall(SignInData) {
+                
               try {
-                const { firstname, lastname, work, email, password, number } = formData;
+                const { firstname, lastname, work, email, password, number } = SignInData;
                 const response = await authService.UserSignIn({ firstname, lastname, work, number, email, password });
             
                 if (response.statusCode === 200) {
@@ -77,16 +59,36 @@ export default function UserSignIn() {
                   isLoading: false,
                   errors: {
                     email: error.response?.data?.message?.email || [],
-                    number: error.response?.data?.message?.number || [],
+                    password: error.response?.data?.password || [],
                   },
                 }));
           
-                console.error("Signup error:", error);
-          
-                // Optionally display a toast for the error message
-                const errorMessage = error.response?.data?.message || error.message;
-                toast.error(errorMessage);
+                
               }
+            }
+    
+            async function submit(event) {
+              event.preventDefault();
+              setFormState((prev) => ({ ...prev, isLoading: true }));
+            
+              const formDataObj = new FormData();
+              Object.entries(formData).forEach(([key, value]) => {
+                formDataObj.append(key, value);
+              });
+            
+              const result = await UserSignInRecall(formDataObj); // Validation before submission
+            
+              if (!result.success) {
+                setFormState((prev) => ({
+                  ...prev,
+                  isLoading: false,
+                  errors: result.error,
+                }));
+                return; // Stop execution if validation fails
+              }else {
+                ApiCall(result.data)
+              }
+          
             }
             
             
@@ -161,7 +163,7 @@ export default function UserSignIn() {
           <InputField
           variant="auth"
           extra="mb-3"
-          label="work"
+          label="number"
           placeholder="Enter number"
           id="number"
           type="number"
